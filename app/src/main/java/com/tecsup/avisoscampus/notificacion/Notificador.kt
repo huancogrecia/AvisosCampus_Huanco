@@ -1,6 +1,8 @@
 package com.tecsup.avisoscampus.notificacion
 
 import android.content.Context
+import android.content.Intent
+import android.app.PendingIntent
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.pm.PackageManager
@@ -11,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.tecsup.avisoscampus.model.Aviso
 import com.tecsup.avisoscampus.R
+import com.tecsup.avisoscampus.MainActivity
 
 object Notificador {
     const val CANAL = "avisos"
@@ -38,12 +41,21 @@ object Notificador {
     fun mostrar(context: Context, aviso: Aviso): Boolean {
         if (!tienePermiso(context)) return false
 
+        val intent = Intent(context, MainActivity::class.java)
+        val pendiente = PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notificacion = NotificationCompat.Builder(context, CANAL)
             .setSmallIcon(R.drawable.ic_notificacion)
             .setContentTitle(aviso.titulo)
             .setContentText(aviso.texto)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setContentIntent(pendiente)
             .build()
 
         NotificationManagerCompat.from(context).notify(aviso.id, notificacion)
