@@ -1,0 +1,50 @@
+package com.tecsup.avisoscampus.viewmodel
+
+import androidx.lifecycle.ViewModel
+import com.tecsup.avisoscampus.data.AvisosRepository
+import com.tecsup.avisoscampus.model.Aviso
+import com.tecsup.avisoscampus.model.PermisoUi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
+    val avisos = repo.avisos
+
+    // Evento de una sola vez: "muestra esta notificación".
+    // El ViewModel NO tiene Context: lo recibe la pantalla.
+    private val _eventos = MutableSharedFlow<Aviso>()
+    val eventos = _eventos.asSharedFlow()
+
+    private val _permiso = MutableStateFlow<PermisoUi>(PermisoUi.SinPedir)
+    val permiso = _permiso.asStateFlow()
+
+    private val _mensaje = MutableStateFlow<String?>(null)
+    val mensaje = _mensaje.asStateFlow()
+
+    private val _escuchandoAvion = MutableStateFlow(false)
+    val escuchandoAvion = _escuchandoAvion.asStateFlow()
+
+    private val _faltan = MutableStateFlow<Int?>(null)
+    val faltan = _faltan.asStateFlow()
+
+    // TODO Paso 2: fun permisoRespondido(concedido: Boolean)
+    fun permisoRespondido(concedido: Boolean) {}
+
+    // TODO Paso 3: fun avisarAhora()
+    fun avisarAhora() {}
+
+    // TODO Paso 5: faltan, recordarEn(segundos) y cancelarRecordatorio()
+    fun recordarEn(segundos: Int = 10) {}
+
+    fun cancelarRecordatorio() {}
+
+    // TODO Paso 6: escuchandoAvion, cambiarEscucha(valor) y alCambiarModoAvion(activo)
+    fun cambiarEscucha(valor: Boolean) {}
+
+    fun alCambiarModoAvion(activo: Boolean) {}
+
+    // TODO Paso 8: fun noSePudoMostrar()
+    fun noSePudoMostrar() {}
+}
