@@ -30,7 +30,9 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     val faltan = _faltan.asStateFlow()
 
     // TODO Paso 2: fun permisoRespondido(concedido: Boolean)
-    fun permisoRespondido(concedido: Boolean) {}
+    fun permisoRespondido(concedido: Boolean) {
+        _permiso.value = if (concedido) PermisoUi.Concedido else PermisoUi.Denegado
+    }
 
     // TODO Paso 3: fun avisarAhora()
     fun avisarAhora() {}
