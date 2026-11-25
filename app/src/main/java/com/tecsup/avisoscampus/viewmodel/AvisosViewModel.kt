@@ -36,12 +36,11 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
 
     private var trabajo: Job? = null
 
-    // TODO Paso 2: fun permisoRespondido(concedido: Boolean)
     fun permisoRespondido(concedido: Boolean) {
         _permiso.value = if (concedido) PermisoUi.Concedido else PermisoUi.Denegado
+        if (concedido) _mensaje.value = null
     }
 
-    // TODO Paso 3: fun avisarAhora()
     fun avisarAhora() {
         viewModelScope.launch {
             val aviso = repo.registrar(
@@ -53,7 +52,6 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
         }
     }
 
-    // TODO Paso 5: faltan, recordarEn(segundos) y cancelarRecordatorio()
     fun recordarEn(segundos: Int = 10) {
         if (trabajo?.isActive == true) return
         trabajo = viewModelScope.launch {
@@ -79,7 +77,6 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
         trabajo?.cancel()
     }
 
-    // TODO Paso 6: escuchandoAvion, cambiarEscucha(valor) y alCambiarModoAvion(activo)
     fun cambiarEscucha(valor: Boolean) {
         _escuchandoAvion.value = valor
     }
@@ -95,6 +92,7 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
         }
     }
 
-    // TODO Paso 8: fun noSePudoMostrar()
-    fun noSePudoMostrar() {}
+    fun noSePudoMostrar() {
+        _mensaje.value = "Sin permiso: el aviso se guardó en el historial, pero no se mostró"
+    }
 }

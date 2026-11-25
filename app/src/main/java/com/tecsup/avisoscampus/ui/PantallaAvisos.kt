@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import android.content.Intent
 import android.content.IntentFilter
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -18,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -42,6 +44,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
     val avisos by vm.avisos.collectAsState()
+    val mensaje by vm.mensaje.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -74,7 +77,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
         vm.eventos.collect { aviso ->
             val mostrado = Notificador.mostrar(contexto, aviso)
             if (!mostrado) {
-                // TODO Paso 8: si no se mostró, avisar al ViewModel
+                vm.noSePudoMostrar()
             }
         }
     }
@@ -115,6 +118,24 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                     },
                     enabled = permiso != com.tecsup.avisoscampus.model.PermisoUi.Concedido
                 ) { Text("Permitir notificaciones") }
+            }
+            if (mensaje != null) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(mensaje!!, color = MaterialTheme.colorScheme.onErrorContainer)
+                        Button(
+                            onClick = {
+                                contexto.startActivity(
+                                    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                        .putExtra(Settings.EXTRA_APP_PACKAGE, contexto.packageName)
+                                )
+                            }
+                        ) { Text("Abrir ajustes") }
+                    }
+                }
             }
             TarjetaBase("Avisos") {
                 Button(onClick = vm::avisarAhora) { Text("Mostrar aviso") }
