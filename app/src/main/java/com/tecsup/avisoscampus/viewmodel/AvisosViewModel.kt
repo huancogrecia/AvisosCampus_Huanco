@@ -31,6 +31,9 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     private val _escuchandoAvion = MutableStateFlow(false)
     val escuchandoAvion = _escuchandoAvion.asStateFlow()
 
+    private val _escuchandoCarga = MutableStateFlow(false)
+    val escuchandoCarga = _escuchandoCarga.asStateFlow()
+
     private val _faltan = MutableStateFlow<Int?>(null)
     val faltan = _faltan.asStateFlow()
 
@@ -87,6 +90,21 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
                 "Modo avión",
                 if (activo) "Activado" else "Desactivado",
                 Origen.MODO_AVION
+            )
+            _eventos.emit(aviso)
+        }
+    }
+
+    fun cambiarEscuchaCarga(valor: Boolean) {
+        _escuchandoCarga.value = valor
+    }
+
+    fun alCambiarCarga(conectado: Boolean) {
+        viewModelScope.launch {
+            val aviso = repo.registrar(
+                "Cargador",
+                if (conectado) "Conectado" else "Desconectado",
+                Origen.CARGADOR
             )
             _eventos.emit(aviso)
         }

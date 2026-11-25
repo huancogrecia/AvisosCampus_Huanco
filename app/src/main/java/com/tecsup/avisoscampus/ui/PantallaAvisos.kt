@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tecsup.avisoscampus.notificacion.Notificador
+import com.tecsup.avisoscampus.receiver.CargaReceiver
 import com.tecsup.avisoscampus.receiver.ModoAvionReceiver
 import com.tecsup.avisoscampus.viewmodel.AvisosViewModel
 
@@ -43,6 +44,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     val permiso by vm.permiso.collectAsState()
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
+    val escuchandoCarga by vm.escuchandoCarga.collectAsState()
     val avisos by vm.avisos.collectAsState()
     val mensaje by vm.mensaje.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
@@ -64,6 +66,25 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                 contexto,
                 receptor,
                 IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            onDispose { contexto.unregisterReceiver(receptor) }
+        } else {
+            onDispose { }
+        }
+    }
+
+    DisposableEffect(escuchandoCarga) {
+        if (escuchandoCarga) {
+            val receptor = CargaReceiver(vm::alCambiarCarga)
+            val filtro = IntentFilter().apply {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+            }
+            ContextCompat.registerReceiver(
+                contexto,
+                receptor,
+                filtro,
                 ContextCompat.RECEIVER_NOT_EXPORTED
             )
             onDispose { contexto.unregisterReceiver(receptor) }
@@ -154,6 +175,11 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                 Switch(
                     checked = escuchandoAvion,
                     onCheckedChange = vm::cambiarEscucha
+                )
+                Text("Escuchar conexión de cargador")
+                Switch(
+                    checked = escuchandoCarga,
+                    onCheckedChange = vm::cambiarEscuchaCarga
                 )
             }
             HistorialAvisos(avisos)
