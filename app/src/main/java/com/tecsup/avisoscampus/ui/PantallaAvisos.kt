@@ -2,8 +2,11 @@ package com.tecsup.avisoscampus.ui
 
 import android.Manifest
 import android.os.Build
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
@@ -23,10 +26,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tecsup.avisoscampus.notificacion.Notificador
+import com.tecsup.avisoscampus.receiver.ModoAvionReceiver
 import com.tecsup.avisoscampus.viewmodel.AvisosViewModel
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -35,6 +40,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     val contexto = LocalContext.current
     val permiso by vm.permiso.collectAsState()
     val faltan by vm.faltan.collectAsState()
+    val escuchandoAvion by vm.escuchandoAvion.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -44,6 +50,21 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     LaunchedEffect(Unit) {
         if (Notificador.tienePermiso(contexto)) {
             vm.permisoRespondido(true)
+        }
+    }
+
+    DisposableEffect(escuchandoAvion) {
+        if (escuchandoAvion) {
+            val receptor = ModoAvionReceiver(vm::alCambiarModoAvion)
+            ContextCompat.registerReceiver(
+                contexto,
+                receptor,
+                IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED),
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            onDispose { contexto.unregisterReceiver(receptor) }
+        } else {
+            onDispose { }
         }
     }
 
@@ -108,7 +129,10 @@ fun PantallaAvisos(vm: AvisosViewModel) {
             }
             TarjetaBase("Receptor de anuncios") {
                 Text("Escuchar el modo avión")
-                Switch(checked = false, onCheckedChange = {}, enabled = false)
+                Switch(
+                    checked = escuchandoAvion,
+                    onCheckedChange = vm::cambiarEscucha
+                )
             }
             TarjetaBase("Historial") {
                 Text("Sin avisos todavía")
