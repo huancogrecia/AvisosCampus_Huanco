@@ -41,6 +41,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     val permiso by vm.permiso.collectAsState()
     val faltan by vm.faltan.collectAsState()
     val escuchandoAvion by vm.escuchandoAvion.collectAsState()
+    val avisos by vm.avisos.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -134,9 +135,7 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                     onCheckedChange = vm::cambiarEscucha
                 )
             }
-            TarjetaBase("Historial") {
-                Text("Sin avisos todavía")
-            }
+            HistorialAvisos(avisos)
         }
     }
 }
