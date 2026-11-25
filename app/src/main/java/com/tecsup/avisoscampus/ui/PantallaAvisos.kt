@@ -34,6 +34,7 @@ import com.tecsup.avisoscampus.viewmodel.AvisosViewModel
 fun PantallaAvisos(vm: AvisosViewModel) {
     val contexto = LocalContext.current
     val permiso by vm.permiso.collectAsState()
+    val faltan by vm.faltan.collectAsState()
     val lanzador = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { concedido ->
@@ -97,9 +98,13 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                 Button(onClick = vm::avisarAhora) { Text("Mostrar aviso") }
             }
             TarjetaBase("Recordatorio") {
-                Button(onClick = {}, enabled = false) { Text("Recordar en 10 s") }
-                Button(onClick = {}, enabled = false) { Text("Cancelar") }
-                Text("Sin recordatorio activo")
+                Button(onClick = { vm.recordarEn() }, enabled = faltan == null) {
+                    Text("Recordar en 10 s")
+                }
+                Button(onClick = vm::cancelarRecordatorio, enabled = faltan != null) {
+                    Text("Cancelar")
+                }
+                Text(faltan?.let { "Faltan $it s" } ?: "Sin recordatorio activo")
             }
             TarjetaBase("Receptor de anuncios") {
                 Text("Escuchar el modo avión")

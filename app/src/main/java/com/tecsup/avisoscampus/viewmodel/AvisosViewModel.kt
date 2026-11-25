@@ -2,6 +2,8 @@ package com.tecsup.avisoscampus.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import com.tecsup.avisoscampus.data.AvisosRepository
 import com.tecsup.avisoscampus.model.Aviso
 import com.tecsup.avisoscampus.model.Origen
@@ -32,6 +34,8 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     private val _faltan = MutableStateFlow<Int?>(null)
     val faltan = _faltan.asStateFlow()
 
+    private var trabajo: Job? = null
+
     // TODO Paso 2: fun permisoRespondido(concedido: Boolean)
     fun permisoRespondido(concedido: Boolean) {
         _permiso.value = if (concedido) PermisoUi.Concedido else PermisoUi.Denegado
@@ -50,9 +54,30 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     }
 
     // TODO Paso 5: faltan, recordarEn(segundos) y cancelarRecordatorio()
-    fun recordarEn(segundos: Int = 10) {}
+    fun recordarEn(segundos: Int = 10) {
+        if (trabajo?.isActive == true) return
+        trabajo = viewModelScope.launch {
+            try {
+                for (restante in segundos downTo 1) {
+                    _faltan.value = restante
+                    delay(1000)
+                }
+                val aviso = repo.registrar(
+                    "Recordatorio",
+                    "Revisa tu laboratorio pendiente",
+                    Origen.RECORDATORIO
+                )
+                _eventos.emit(aviso)
+            } finally {
+                _faltan.value = null
+                trabajo = null
+            }
+        }
+    }
 
-    fun cancelarRecordatorio() {}
+    fun cancelarRecordatorio() {
+        trabajo?.cancel()
+    }
 
     // TODO Paso 6: escuchandoAvion, cambiarEscucha(valor) y alCambiarModoAvion(activo)
     fun cambiarEscucha(valor: Boolean) {}
