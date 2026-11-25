@@ -1,13 +1,16 @@
 package com.tecsup.avisoscampus.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.tecsup.avisoscampus.data.AvisosRepository
 import com.tecsup.avisoscampus.model.Aviso
+import com.tecsup.avisoscampus.model.Origen
 import com.tecsup.avisoscampus.model.PermisoUi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     val avisos = repo.avisos
@@ -35,7 +38,16 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     }
 
     // TODO Paso 3: fun avisarAhora()
-    fun avisarAhora() {}
+    fun avisarAhora() {
+        viewModelScope.launch {
+            val aviso = repo.registrar(
+                "Tarea lista",
+                "Tu entrega fue registrada",
+                Origen.BOTON
+            )
+            _eventos.emit(aviso)
+        }
+    }
 
     // TODO Paso 5: faltan, recordarEn(segundos) y cancelarRecordatorio()
     fun recordarEn(segundos: Int = 10) {}

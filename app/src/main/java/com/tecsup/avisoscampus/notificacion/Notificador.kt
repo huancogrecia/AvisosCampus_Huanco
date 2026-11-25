@@ -7,7 +7,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.Manifest
 import androidx.core.content.ContextCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.tecsup.avisoscampus.model.Aviso
+import com.tecsup.avisoscampus.R
 
 object Notificador {
     const val CANAL = "avisos"
@@ -33,9 +36,17 @@ object Notificador {
     }
 
     fun mostrar(context: Context, aviso: Aviso): Boolean {
-        // TODO 1: si no tienePermiso(context) -> return false
-        // TODO 2: construir la notificación con NotificationCompat.Builder
-        // TODO 3: NotificationManagerCompat.from(context).notify(aviso.id, ...)
-        return false
+        if (!tienePermiso(context)) return false
+
+        val notificacion = NotificationCompat.Builder(context, CANAL)
+            .setSmallIcon(R.drawable.ic_notificacion)
+            .setContentTitle(aviso.titulo)
+            .setContentText(aviso.texto)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(aviso.id, notificacion)
+        return true
     }
 }
