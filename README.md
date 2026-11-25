@@ -61,6 +61,20 @@ Capturas tomadas en el emulador Pixel 6 Pro con Android 13 (API 33).
 
 ![Mensaje y opción de ajustes después de denegar el permiso](evidencias/permiso-denegado.png)
 
+## Mejoras de la Fase 2
+
+### 1. Canales de notificación Avisos y Urgentes
+
+![Canales Avisos y Urgentes configurados para AvisosCampus](evidencias/mejora-ia-canales.png)
+
+### 2. Notificación expandida con BigTextStyle
+
+![Recordatorio expandido en el panel de notificaciones](evidencias/mejora-ia-bigtext.png)
+
+### 3. Avisos al conectar y desconectar el cargador
+
+![Notificaciones de conexión y desconexión del cargador](evidencias/mejora-ia-cargador.png)
+
 ## Respuestas: Para pensar
 
 1. **¿Por qué una notificación necesita un canal y un permiso? ¿Qué pasa si falta cada uno?**  
